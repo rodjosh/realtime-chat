@@ -24,9 +24,18 @@ io.attach(httpServer, {
 //Serving static files
 app.use(express.static(__dirname + '/public'));
 
+const users = [];
+
 io.on('connection', (socket)=>{
-	console.log(socket.id);
-})
+	socket.on('check-user', (username, isUsed)=>{
+		isUsed(users.includes(username));
+	})
+
+	socket.on('new-user', (username)=>{ 
+		users.push(username);
+		io.emit('users-update', users);
+	});
+});
 
 /*
 Listening from the httpServer because app.listen()
