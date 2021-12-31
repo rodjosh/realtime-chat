@@ -19,6 +19,11 @@ io.attach(httpServer, {
 	serveClient: true
 });
 
+/* STARTS CHAT LOGIC */
+
+//Serving static files
+app.use(express.static(__dirname + '/public'));
+
 //Listening from the http server
 httpServer.listen(3000, ()=>{
 	console.log('Listening on 3000');
