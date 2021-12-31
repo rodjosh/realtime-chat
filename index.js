@@ -24,7 +24,15 @@ io.attach(httpServer, {
 //Serving static files
 app.use(express.static(__dirname + '/public'));
 
-//Listening from the http server
+io.on('connection', (socket)=>{
+	console.log(socket.id);
+})
+
+/*
+Listening from the httpServer because app.listen()
+creates a new httpServer without socket.io attached
+*/
+
 httpServer.listen(3000, ()=>{
 	console.log('Listening on 3000');
 })
