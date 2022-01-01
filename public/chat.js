@@ -1,21 +1,31 @@
 function enterChat(){
+	//Take username information
 	const usernameInput = document.getElementById('username-input');
 	const username = usernameInput.value.toLowerCase();
 
+	//Throw if username is empty
 	if (username.length == 0) {
 		alert('Empty username');
 		return
 	}
 
+	//Initialize sockets
 	const socket = io();
 	
+	//Everytime a user connects:
 	socket.on('connect', ()=>{
+
+		//Check if the username is available
 		socket.emit('check-user', username, (used)=>{
-			if (used){
-				alert('Username already used');
-			} else {
-				startChat(socket, username);
-			}
+
+			//If used stop chat logic
+			if (used) {
+				socket.disconnect();
+				return alert('Username already used')
+			};
+			
+			//If not continue chat logic
+			startChat(socket, username);
 		});
 	});
 }
@@ -82,5 +92,6 @@ function updateMessages(messages){
 	messagesDiv.innerHTML = listedMessages;
 }
 
+//Set chat logic start to enter chat button
 const enterButton = document.getElementById('enter-chat');
 enterButton.addEventListener('click', enterChat);
