@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300&display=swap');
+
+* {
+	box-sizing: border-box;
+	font-size: 18px;
+	font-family: 'Nunito', sans-serif;
+}
+
+#enter, #chat {
+	max-width: 500px;
+	width: 100%;
+	margin: auto;
+	padding-top: 20px;
+}
+
+#enter input, #chat #online-users, #chat 
+#chat-messages, #chat input {
+	width: 100%;
+	margin-top: 10px;
+	padding: 10px;
+}
+
+.online-user {
+	border-width: 1px;
+	border-color: gray;
+	border-style: solid;
+	padding: 5px 10px;
+	margin: 5px;
+	border-radius: 5px;
+}

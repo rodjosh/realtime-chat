@@ -32,21 +32,54 @@ function startChat(socket, username){
 	socket.on('users-update', (list)=>{
 		updateList(list);
 	})
+
+	const messageSubmit = document.getElementById('chat-submit');
+	messageSubmit.addEventListener('click', ()=>{
+		sendMessage(socket, username);
+	})
+
+	socket.on('messages-update', updateMessages);
 }
 
 function updateList(list) {
-	console.log(list);
-
 	const onlineUsersDiv = document.getElementById('online-users');
 	let onlineUsers = '';
 
+	onlineUsers+= '<h3>Online users:</h3>'
+
 	list.forEach((user)=>{
-		onlineUsers+= '<span class="online-user">';
+		onlineUsers+= '<span class="online-user"> ';
 		onlineUsers+= encodeURIComponent(user);
-		onlineUsers+= '</span>'
+		onlineUsers+= ' </span>'
 	})
 
 	onlineUsersDiv.innerHTML = onlineUsers;
+}
+
+function sendMessage(socket, username) {
+	const messageInput = document.getElementById('chat-input');
+	const message = messageInput.value;
+
+	if (message.length == 0){
+		alert('Empty message');
+		return
+	}
+
+	socket.emit('new-message', username, message);
+}
+
+function updateMessages(messages){
+	const messagesDiv = document.getElementById('chat-messages');
+	let listedMessages = '';
+
+	messages.forEach(message => {
+		listedMessages += '<div class="message">';
+		listedMessages += '<strong>' + message.username + ': </strong>';
+		listedMessages += '<span>' + message.text + '<span>';
+		listedMessages += '</div>';
+	})
+
+	messagesDiv.innerHTML = listedMessages;
 }
 
 const enterButton = document.getElementById('enter-chat');

@@ -2,6 +2,7 @@
 const http = require('http');
 const socket_io = require('socket.io');
 const express = require('express');
+const htmlEntities = require('html-entities');
 
 //Express intance
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.static(__dirname + '/public'));
 
 const users = [];
 const users_id = [];
+const messages = [];
 
 io.on('connection', (socket)=>{
 	socket.on('check-user', (username, isUsed)=>{
@@ -37,18 +39,34 @@ io.on('connection', (socket)=>{
 		users_id.push(socket.id);
 
 		io.emit('users-update', users);
+		io.emit('messages-update', messages);
+
+		socket.on('new-message', (username, text)=>{
+			const message = {
+				username: username,
+				text: text
+			};
+
+			messages.push(message);
+
+			if (messages.length > 15){
+				messages.shift();
+			}
+
+			io.emit('messages-update', messages);
+		});
+
+		socket.on('disconnect', ()=>{
+			if (users_id.includes(socket.id)){
+				const index = users_id.indexOf(socket.id);
+
+				users.splice(index, 1);
+				users_id.splice(index, 1);
+
+				io.emit('users-update', users);
+			}
+		})
 	});
-
-	socket.on('disconnect', ()=>{
-		if (users_id.includes(socket.id)){
-			const index = users_id.indexOf(socket.id);
-
-			users.splice(index, 1);
-			users_id.splice(index, 1);
-
-			io.emit('users-update', users);
-		}
-	})
 });
 
 /*
