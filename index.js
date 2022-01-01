@@ -25,6 +25,7 @@ io.attach(httpServer, {
 app.use(express.static(__dirname + '/public'));
 
 const users = [];
+const users_id = [];
 
 io.on('connection', (socket)=>{
 	socket.on('check-user', (username, isUsed)=>{
@@ -33,8 +34,21 @@ io.on('connection', (socket)=>{
 
 	socket.on('new-user', (username)=>{ 
 		users.push(username);
+		users_id.push(socket.id);
+
 		io.emit('users-update', users);
 	});
+
+	socket.on('disconnect', ()=>{
+		if (users_id.includes(socket.id)){
+			const index = users_id.indexOf(socket.id);
+
+			users.splice(index, 1);
+			users_id.splice(index, 1);
+
+			io.emit('users-update', users);
+		}
+	})
 });
 
 /*

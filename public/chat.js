@@ -1,4 +1,4 @@
-function startChat(){
+function enterChat(){
 	const usernameInput = document.getElementById('username-input');
 	const username = usernameInput.value.toLowerCase();
 
@@ -8,20 +8,19 @@ function startChat(){
 	}
 
 	const socket = io();
-	let isUsernameUsed;
-
+	
 	socket.on('connect', ()=>{
-		console.log("Check user");
 		socket.emit('check-user', username, (used)=>{
-			isUsernameUsed = used;
+			if (used){
+				alert('Username already used');
+			} else {
+				startChat(socket, username);
+			}
 		});
 	});
+}
 
-	if (isUsernameUsed) {
-		alert('Username already in use');
-		return location.reload();
-	}
-
+function startChat(socket, username){
 	const enterDiv = document.getElementById('enter');
 	enterDiv.style.display = 'none';
 
@@ -37,7 +36,18 @@ function startChat(){
 
 function updateList(list) {
 	console.log(list);
+
+	const onlineUsersDiv = document.getElementById('online-users');
+	let onlineUsers = '';
+
+	list.forEach((user)=>{
+		onlineUsers+= '<span class="online-user">';
+		onlineUsers+= encodeURIComponent(user);
+		onlineUsers+= '</span>'
+	})
+
+	onlineUsersDiv.innerHTML = onlineUsers;
 }
 
 const enterButton = document.getElementById('enter-chat');
-enterButton.addEventListener('click', startChat);
+enterButton.addEventListener('click', enterChat);
