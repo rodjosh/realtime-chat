@@ -25,48 +25,74 @@ io.attach(httpServer, {
 //Serving static files
 app.use(express.static(__dirname + '/public'));
 
+//Containers
 const users = [];
 const users_id = [];
 const messages = [];
 
+//When a new connection happen do:
 io.on('connection', (socket)=>{
+
+	//Check if the username exists
 	socket.on('check-user', (username, isUsed)=>{
-		isUsed(users.includes(username));
-	})
 
-	socket.on('new-user', (username)=>{ 
-		users.push(username);
-		users_id.push(socket.id);
+		//If exists execute callback and return
+		const used = users.includes(username);
+		if (used) return isUsed(used);
 
-		io.emit('users-update', users);
-		io.emit('messages-update', messages);
+		//If not attach events to create a new one
+		socket.on('new-user', (username)=>{ 
+			
+			//Store the user details in the containers
+			users.push(username);
+			users_id.push(socket.id);
 
-		socket.on('new-message', (username, text)=>{
-			const message = {
-				username: username,
-				text: text
-			};
-
-			messages.push(message);
-
-			if (messages.length > 15){
-				messages.shift();
-			}
-
+			//Send online users and messages information
+			io.emit('users-update', users);
 			io.emit('messages-update', messages);
+
+			//For every new user attach:
+
+			//New message event
+			socket.on('new-message', (username, text)=>{
+
+				//Basic message structure
+				const message = {
+					username: username,
+					text: text
+				};
+
+				//Store the message in the messages container
+				messages.push(message);
+
+				//Set messages container limit to 15
+				if (messages.length > 15){
+					messages.shift();
+				}
+
+				//Send new messages information
+				io.emit('messages-update', messages);
+			});
+
+			//Disconnect event to remove from the containers
+			socket.on('disconnect', ()=>{
+
+				//If the user exists delete it from containers
+				if (users_id.includes(socket.id)){
+					const index = users_id.indexOf(socket.id);
+
+					users.splice(index, 1);
+					users_id.splice(index, 1);
+
+					//Send new online users information
+					io.emit('users-update', users);
+				}
+			})
 		});
 
-		socket.on('disconnect', ()=>{
-			if (users_id.includes(socket.id)){
-				const index = users_id.indexOf(socket.id);
-
-				users.splice(index, 1);
-				users_id.splice(index, 1);
-
-				io.emit('users-update', users);
-			}
-		})
-	});
+		//Once events attached executes callback
+		isUsed(used);
+	})
 });
 
 /*
