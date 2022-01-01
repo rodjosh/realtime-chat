@@ -59,7 +59,7 @@ io.on('connection', (socket)=>{
 				//Basic message structure
 				const message = {
 					username: username,
-					text: text
+					text: htmlEntities.encode(text)
 				};
 
 				//Store the message in the messages container
