@@ -1,4 +1,4 @@
-# realtime-chat
+# Realtime Chat
 
 Realtime chat using NodeJS, Express and Socket.io
 
