@@ -12,4 +12,4 @@ Realtime chat using NodeJS, Express and Socket.io
 
 ### Live Demo:
 
-Glitch: https://rodjosh-realtime-chat.glitch.me
+Replit: https://replit.com/@rodjosh/realtime-chat
